@@ -186,6 +186,24 @@ export const registerSettings = function () {
 		}
 	});
 
+	game.settings.register(modulename, "combat-portrait-position", {
+		name: i18n("MonksCommonDisplay.combat-portrait-position.name"),
+		hint: i18n("MonksCommonDisplay.combat-portrait-position.hint"),
+		scope: "world",
+		config: true,
+		default: "bottom-left",
+		type: String,
+		choices: {
+			"top-left": i18n("MonksCommonDisplay.combat-portrait-position.top-left"),
+			"top-right": i18n("MonksCommonDisplay.combat-portrait-position.top-right"),
+			"bottom-left": i18n("MonksCommonDisplay.combat-portrait-position.bottom-left"),
+			"bottom-right": i18n("MonksCommonDisplay.combat-portrait-position.bottom-right")
+		},
+		onChange: () => {
+			MonksCommonDisplay.updateCombatPortrait();
+		}
+	});
+
 	game.settings.register(modulename, "combat-portrait-opacity", {
 		name: i18n("MonksCommonDisplay.combat-portrait-opacity.name"),
 		hint: i18n("MonksCommonDisplay.combat-portrait-opacity.hint"),
@@ -218,25 +236,6 @@ export const registerSettings = function () {
 			MonksCommonDisplay.toggleCommonDisplay();
 		}
 	});
-
-	/*
-	game.settings.register(modulename, "combat-scale", {
-		name: i18n("MonksCommonDisplay.combat-scale.name"),
-		hint: i18n("MonksCommonDisplay.combat-scale.hint"),
-		scope: "world",
-		config: true,
-		range: {
-			min: 0.1,
-			max: 5,
-			step: 0.1,
-		},
-		default: 1,
-		type: Number,
-		onChange: () => {
-			MonksCommonDisplay.toggleCommonDisplay();
-		}
-	});
-	*/
 
 	game.settings.register(modulename, "close-after", {
 		name: i18n("MonksCommonDisplay.close-after.name"),

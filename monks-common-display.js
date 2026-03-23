@@ -135,36 +135,6 @@ export class MonksCommonDisplay {
             wrapped(...args);
         });
 
-        /*
-        patchFunc("foundry.documents.collections.Journal.prototype.constructor.show", async function (wrapped, ...args) {
-            let commonid = foundry.utils.randomID();
-            let [doc, { force=false, users=[] }] = args;
-
-            if (!((doc instanceof foundry.documents.JournalEntry)
-                || (doc instanceof foundry.documents.JournalEntryPage))) return;
-            if (!doc.isOwner) throw new Error(game.i18n.localize("JOURNAL.ShowBadPermissions"));
-            const strings = Object.fromEntries(["all", "authorized", "selected"].map(k => [k, game.i18n.localize(k)]));
-            let closeAfter = setting("close-after") ?? 0;
-            if (closeAfter != 0) {
-                window.setTimeout(() => {
-                    MonksCommonDisplay.emit("closeDocument", { args: { id: commonid } });
-                }, closeAfter * 1000);
-            }
-            return new Promise(resolve => {
-                game.socket.emit("showEntry", doc.uuid, { force, users, commonid }, () => {
-                    Journal._showEntry(doc.uuid, force);
-                    ui.notifications.info("JOURNAL.ActionShowSuccess", {
-                        format: {
-                            title: doc.name,
-                            which: users.length ? strings.selected : force ? strings.all : strings.authorized
-                        }
-                    });
-                    return resolve(doc);
-                });
-            });
-        }, "OVERRIDE");
-        */
-
         patchFunc("foundry.applications.sidebar.tabs.ActorDirectory.prototype._onClickEntry", async function (wrapped, ...args) {
             let event = args[0];
             if (!!MonksCommonDisplay.selectToken) {
@@ -185,30 +155,6 @@ export class MonksCommonDisplay {
             } else
                 wrapped(...args);
         }, "MIXED");
-
-        /*
-        patchFunc("foundry.documents.collections.Journal.prototype.constructor._showEntry", async function (...args) {
-            let entry = await fromUuid(uuid);
-            const options = { tempOwnership: force, mode: JournalSheet.VIEW_MODES.MULTIPLE, pageIndex: 0 };
-            if (entry instanceof JournalEntryPage) {
-                options.mode = JournalSheet.VIEW_MODES.SINGLE;
-                options.pageId = entry.id;
-                // Set temporary observer permissions for this page.
-                entry.ownership[game.userId] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER;
-                entry = entry.parent;
-            }
-            else if (entry instanceof JournalEntry) entry.ownership[game.userId] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER;
-            else return;
-            if (!force && !entry.visible) return;
-    
-            // Show the sheet with the appropriate mode
-            entry.sheet.render(true, options);
-    
-            if (options.commonid) {
-                MonksCommonDisplay.windows[options.commonid] = ip;
-            }
-        }, "OVERRIDE");
-        */
 
         patchFunc("Scene.prototype.view", async function (wrapped, ...args) {
             let result = await wrapped.call(this, ...args);
@@ -502,13 +448,33 @@ export class MonksCommonDisplay {
             imgEl.alt = combatant?.name || "";
         }
 
-        const popout = document.getElementById("combat-popout");
-        if (popout) {
-            const rect = popout.getBoundingClientRect();
-            document.documentElement.style.setProperty("--mcd-combat-portrait-left", `${Math.round(rect.right + 12)}px`);
-            document.documentElement.style.setProperty("--mcd-combat-portrait-top", `${Math.round(rect.top)}px`);
-            document.documentElement.style.setProperty("--mcd-combat-portrait-max-height", `${Math.round(window.innerHeight - rect.top - 20)}px`);
+        const position = setting("combat-portrait-position") || "bottom-left";
+        const margin = 20;
+        const root = document.documentElement.style;
+
+        // Clear all position properties first
+        root.removeProperty("--mcd-combat-portrait-top");
+        root.removeProperty("--mcd-combat-portrait-bottom");
+        root.removeProperty("--mcd-combat-portrait-left");
+        root.removeProperty("--mcd-combat-portrait-right");
+
+        if (position.includes("top")) {
+            root.setProperty("--mcd-combat-portrait-top", `${margin}px`);
+            root.setProperty("--mcd-combat-portrait-bottom", "auto");
+        } else {
+            root.setProperty("--mcd-combat-portrait-top", "auto");
+            root.setProperty("--mcd-combat-portrait-bottom", `${margin}px`);
         }
+
+        if (position.includes("left")) {
+            root.setProperty("--mcd-combat-portrait-left", `${margin}px`);
+            root.setProperty("--mcd-combat-portrait-right", "auto");
+        } else {
+            root.setProperty("--mcd-combat-portrait-left", "auto");
+            root.setProperty("--mcd-combat-portrait-right", `${margin}px`);
+        }
+
+        root.setProperty("--mcd-combat-portrait-max-height", `${Math.round(window.innerHeight - margin * 2)}px`);
     }
 
     static screenChanged() {
@@ -781,15 +747,6 @@ Hooks.on("controlToken", async (token, control) => {
 });
 
 Hooks.on("updateToken", async function (document, data, options, userid) {
-    /*
-    if (game.user.isGM && MonksCommonDisplay.toolbar) {
-        let tkn = MonksCommonDisplay.toolbar.tokens.find(t => t.token.id == document.id);
-        if (tkn) {
-            this.updateToken(tkn, options.ignoreRefresh !== true);
-        }
-    }*/
-
-    //+++ only if this is a selected token and the texture src is changing
     if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM)
         MonksCommonDisplay.toolbar.render(true);
 

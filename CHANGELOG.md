@@ -1,3 +1,13 @@
+# Version 13.1.0-fork.2
+
+Added combat portrait position setting — choose which screen corner the portrait appears in (top-left, top-right, bottom-left, bottom-right). Default is bottom-left.
+
+Portrait now uses fixed positioning relative to the viewport instead of anchoring to the combat popout.
+
+Removed deprecated `minimumCoreVersion` and `compatibleCoreVersion` fields from module.json (superseded by `compatibility`).
+
+Removed commented-out dead code from settings, main module JS, and CSS.
+
 # Version 13.1.0-fork.1
 
 Added combat portrait settings (toggle, size, opacity).

@@ -21,7 +21,7 @@ A player that is set to be common display will have a screen icon beside their n
 
 When you have a player selected as the common display, their ui will disappear, leaving just the viewing canvas. You can specify which parts of the screen you want to remain in the settings, in case you want to show the chat log, or the combat tracker.
 
-When combat is active, the common display can show the active combatant's portrait next to the combat tracker. You can toggle the portrait, set its size (small/medium/large), and adjust opacity in the module settings.
+When combat is active, the common display can show the active combatant's portrait. You can toggle the portrait, choose which screen corner it appears in (top-left, top-right, bottom-left, bottom-right), set its size (small/medium/large), and adjust opacity in the module settings.
 
 Using the common display toolbar you can clear any journal entries or images that have been shared.
 As well, as in the settings you can have shared images clear after a certain amount of time.
